@@ -6,9 +6,10 @@ from flask.views import View
 from werkzeug.wrappers import Response
 from werkzeug.exceptions import NotFound
 
+from dulwich.archive import tar_stream
 from dulwich.objects import Blob
 
-from klaus import markup, tarutils
+from klaus import markup
 from klaus.utils import parent_directory, subpaths, pygmentize, encode_for_git, \
                         force_unicode, guess_is_binary, guess_is_image, replace_dupes
 
@@ -241,14 +242,14 @@ class DownloadView(BaseRepoView):
             'Cache-Control': "no-store",  # Disables browser caching
         }
 
-        tar_stream = tarutils.tar_stream(
+        stream = tar_stream(
             self.context['repo'],
             self.context['blob_or_tree'],
             self.context['commit'].commit_time,
             format="gz"
         )
         return Response(
-            tar_stream,
+            stream,
             mimetype="application/x-tgz",
             headers=headers
         )
