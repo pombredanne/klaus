@@ -1,0 +1,19 @@
+Source: klaus
+Section: vcs
+Priority: optional
+Maintainer: Jelmer Vernooij <jelmer@debian.org>
+Build-Depends: debhelper (>= 9), python-dulwich
+Standards-Version: 3.9.6
+Homepage: https://github.com/jonashaag/klaus
+Vcs-Git: git://anonscm.debian.org/collab-maint/klaus.git
+Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/klaus.git;a=summary
+
+Package: klaus
+Architecture: all
+Depends: ${misc:Depends}, python-dulwich
+Description: simple easy-to-set-up Git web viewer
+ Features:
+ .
+  * Easy to set up -- almost no configuration required
+  * Syntax highlighting
+  * Git Smart HTTP support

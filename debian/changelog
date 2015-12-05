@@ -1,0 +1,5 @@
+klaus (0.7.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Jelmer Vernooij <jelmer@debian.org>  Sat, 05 Dec 2015 15:54:20 +0000
