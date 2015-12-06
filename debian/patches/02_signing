@@ -1,0 +1,49 @@
+commit 589873a2c24ea3a5b7b6ad786a72957a39a67f71
+Author: Jelmer Vernooij <jelmer@jelmer.uk>
+Date:   Sun Nov 1 02:09:49 2015 +0000
+
+    Disable GPG signing during tests.
+
+diff --git a/tests/repos/scripts/dont-render b/tests/repos/scripts/dont-render
+index 2304496..a203e4c 100755
+--- a/tests/repos/scripts/dont-render
++++ b/tests/repos/scripts/dont-render
+@@ -13,4 +13,4 @@ git add image.jpg
+ yes | head -n 102400 > toolarge
+ git add toolarge
+ 
+-git commit -am first
++git commit --no-gpg-sign -am first
+diff --git a/tests/repos/scripts/no-newline-at-end-of-file b/tests/repos/scripts/no-newline-at-end-of-file
+index 5bb8593..99793ae 100755
+--- a/tests/repos/scripts/no-newline-at-end-of-file
++++ b/tests/repos/scripts/no-newline-at-end-of-file
+@@ -4,9 +4,9 @@ git init
+ echo 1 > test
+ echo -n 2 >> test
+ git add test
+-git commit -m old
++git commit --no-gpg-sign -m old
+ 
+ echo 1 > test
+ echo 2 >> test
+ git add test
+-git commit -m new
++git commit --no-gpg-sign -m new
+diff --git a/tests/repos/scripts/test_repo b/tests/repos/scripts/test_repo
+index 141df97..454896c 100755
+--- a/tests/repos/scripts/test_repo
++++ b/tests/repos/scripts/test_repo
+@@ -5,9 +5,9 @@ echo "int a;" > test.c
+ echo "function test() {}" > test.js
+ git add test.c
+ git add test.js
+-git commit -m "Add some code"
++git commit --no-gpg-sign -m "Add some code"
+ 
+-git commit --allow-empty -m "Empty commit 1"
++git commit --no-gpg-sign --allow-empty -m "Empty commit 1"
+ git tag tag1
+ 
+-git commit --allow-empty -m "Empty commit 2"
++git commit --no-gpg-sign --allow-empty -m "Empty commit 2"
