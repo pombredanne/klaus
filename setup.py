@@ -47,6 +47,7 @@ setup(
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
     ],
+    data_files=[('share/man/man8', ['klaus.8'])],
     install_requires=requires,
 )
 
