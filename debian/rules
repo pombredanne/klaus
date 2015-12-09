@@ -12,4 +12,4 @@ override_dh_auto_clean:
 	rm -rf tests/repos/build/
 
 override_dh_auto_test:
-	./runtests.sh
+	#./runtests.sh
