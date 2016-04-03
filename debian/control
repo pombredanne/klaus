@@ -3,7 +3,7 @@ Section: vcs
 Priority: optional
 Maintainer: Jelmer Vernooij <jelmer@debian.org>
 Build-Depends-Indep: debhelper (>= 9), python-all (>= 2.6.6-3), python-dulwich (>= 0.12.0), python-six, python-flask, python-pygments, python-humanize, python-requests, python-werkzeug, exuberant-ctags, dh-python, python-setuptools
-Standards-Version: 3.9.6
+Standards-Version: 3.9.7
 Homepage: https://github.com/jonashaag/klaus
 Vcs-Git: git://anonscm.debian.org/collab-maint/klaus.git
 Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/klaus.git;a=summary
