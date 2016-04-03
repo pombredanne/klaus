@@ -6,7 +6,7 @@ from klaus import views, utils
 from klaus.repo import FancyRepo
 
 
-KLAUS_VERSION = utils.guess_git_revision() or '0.7.1'
+KLAUS_VERSION = utils.guess_git_revision() or '0.8.0'
 
 
 class Klaus(flask.Flask):
@@ -49,6 +49,7 @@ class Klaus(flask.Flask):
     def setup_routes(self):
         for endpoint, rule in [
             ('repo_list',   '/'),
+            ('robots_txt',  '/robots.txt/'),
             ('blob',        '/<repo>/blob/<rev>/'),
             ('blob',        '/<repo>/blob/<rev>/<path:path>'),
             ('blame',       '/<repo>/blame/<rev>/'),
@@ -61,7 +62,6 @@ class Klaus(flask.Flask):
             ('history',     '/<repo>/'),
             ('history',     '/<repo>/tree/<rev>/'),
             ('history',     '/<repo>/tree/<rev>/<path:path>'),
-            ('robots_txt',  '/robots.txt/'),
             ('download',    '/<repo>/tarball/<rev>/'),
         ]:
             self.add_url_rule(rule, view_func=getattr(views, endpoint))
@@ -120,7 +120,7 @@ def make_app(repo_paths, site_name, use_smarthttp=False, htdigest_file=None,
         use_smarthttp,
         ctags_policy,
     )
-    app.wsgi_app = utils.SubUri(app.wsgi_app)
+    app.wsgi_app = utils.ProxyFix(app.wsgi_app)
 
     if use_smarthttp:
         # `path -> Repo` mapping for Dulwich's web support
@@ -133,7 +133,7 @@ def make_app(repo_paths, site_name, use_smarthttp=False, htdigest_file=None,
             backend=dulwich_backend,
             fallback_app=app.wsgi_app,
         )
-        dulwich_wrapped_app = utils.SubUri(dulwich_wrapped_app)
+        dulwich_wrapped_app = utils.ProxyFix(dulwich_wrapped_app)
 
         # `receive-pack` is requested by the "client" on a push
         # (the "server" is asked to *receive* packs), i.e. we need to secure
