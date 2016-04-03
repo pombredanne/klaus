@@ -1,4 +1,4 @@
-klaus (0.8.0-1) UNRELEASED; urgency=medium
+klaus (0.8.0-1) unstable; urgency=medium
 
   * New upstream release.
   * Bump standards version to 3.9.7 (no changes).
