@@ -1,5 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # coding: utf-8
+from __future__ import print_function
 
 import sys
 import os
@@ -25,7 +26,7 @@ def git_repository(path):
 
 
 def make_parser():
-    parser = argparse.ArgumentParser(epilog="Gemüse kaufen!")
+    parser = argparse.ArgumentParser()
     parser.add_argument('--host',     help="default: 127.0.0.1", default='127.0.0.1')
     parser.add_argument('--port',     help="default: 8080", default=8080, type=int)
     parser.add_argument('--site-name', help="site name showed in header. default: your hostname")
@@ -57,15 +58,15 @@ def main():
     args = make_parser().parse_args()
 
     if args.version:
-        print KLAUS_VERSION
+        print(KLAUS_VERSION)
         return 0
 
     if args.htdigest and not args.smarthttp:
-        print >> sys.stderr, "ERROR: --htdigest option has no effect without --smarthttp enabled"
+        print("ERROR: --htdigest option has no effect without --smarthttp enabled", file=sys.stderr)
         return 1
 
     if not args.repos:
-        print >> sys.stderr, "WARNING: No repositories supplied -- syntax is 'klaus dir1 dir2...'."
+        print("WARNING: No repositories supplied -- syntax is 'klaus dir1 dir2...'.", file=sys.stderr)
 
     if not args.site_name:
         args.site_name = '%s:%d' % (args.host, args.port)
@@ -73,12 +74,12 @@ def main():
     if args.ctags != 'none':
         from klaus.ctagsutils import check_have_exuberant_ctags
         if not check_have_exuberant_ctags():
-            print >> sys.stderr, "ERROR: Exuberant ctags not installed (or 'ctags' binary isn't *Exuberant* ctags)"
+            print("ERROR: Exuberant ctags not installed (or 'ctags' binary isn't *Exuberant* ctags)", file=sys.stderr)
             return 1
         try:
             import ctags
         except ImportError:
-            raise ImportError("Please install 'python-ctags' to enable ctags support.")
+            raise ImportError("Please install 'python-ctags3' to enable ctags support.")
 
     app = make_app(
         args.repos,

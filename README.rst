@@ -12,11 +12,18 @@ klaus: a simple, easy-to-set-up Git web viewer that Just Works™.
 
 (If it doesn't Just Work for you, please file a bug.)
 
+* Super easy to set up -- no configuration required
+* Supports Python 2 and Python 3
+* Syntax highlighting
+* Git Smart HTTP support
+* Code navigation using Exuberant ctags
+
 :Demo: http://klausdemo.lophus.org
 :Mailing list: http://groups.google.com/group/klaus-users
 :On PyPI: http://pypi.python.org/pypi/klaus/
 :Wiki: https://github.com/jonashaag/klaus/wiki
 :License: ISC (BSD)
+
 
 Contributing
 ------------
@@ -25,13 +32,7 @@ Please do it!
 I'm equally happy with bug reports/feature ideas and code contributions.
 If you have any questions/issues, I'm happy to help!
 
-For starters, `here are a few ideas what to work on. <https://github.com/jonashaag/klaus/issues>`_ :-)
-
-Features
---------
-* Super easy to set up -- no configuration required
-* Syntax highlighting
-* Git Smart HTTP support
+For starters, `here are a few ideas what to work on. <https://github.com/jonashaag/klaus/issues?q=is%3Aissue+is%3Aopen+label%3A%22C%3A+1%22>`_ :-)
 
 
 |img1|_ |img2|_ |img3|_

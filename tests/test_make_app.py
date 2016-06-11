@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import subprocess
 import tempfile
 import shutil
@@ -109,7 +110,7 @@ def _can_clone(http_get, url):
     tmp = tempfile.mkdtemp()
     try:
         return any([
-            b"git clone" in http_get(TEST_REPO_URL).content,
+            "git clone" in http_get(TEST_REPO_URL).text,
             _check_http200(http_get, TEST_REPO_URL + "info/refs?service=git-upload-pack"),
             subprocess.call(["git", "clone", url, tmp]) == 0,
         ])
@@ -142,7 +143,7 @@ def ctags_tags_and_branches():
 
 def ctags_all():
     all_refs = re.findall('href=".+/commit/([a-z0-9]{40})/">',
-                          requests.get(UNAUTH_TEST_REPO_URL).content)
+                          requests.get(UNAUTH_TEST_REPO_URL).text)
     assert len(all_refs) == 3
     return all(
         _ctags_enabled(ref, f)
@@ -151,8 +152,9 @@ def ctags_all():
 
 def _ctags_enabled(ref, filename):
     response = requests.get(UNAUTH_TEST_REPO_URL + "blob/%s/%s" % (ref, filename))
+    assert response.status_code == 200, response.text
     href = '<a href="/%sblob/%s/%s#L-1">' % (TEST_REPO_URL, ref, filename)
-    return href in response.content
+    return href in response.text
 
 
 def _GET_unauth(url=""):
