@@ -1,3 +1,9 @@
+klaus (1.0.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Sat, 11 Jun 2016 13:40:23 +0000
+
 klaus (0.8.0-1) unstable; urgency=medium
 
   * New upstream release.
