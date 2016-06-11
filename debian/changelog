@@ -1,6 +1,7 @@
 klaus (1.0.1-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Bump standards version to 3.9.8 (no changes).
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sat, 11 Jun 2016 13:40:23 +0000
 
