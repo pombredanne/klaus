@@ -1,10 +1,18 @@
 #!/usr/bin/make -f
 DPKG_EXPORT_BUILDFLAGS = 1
 
+export PYBUILD_AFTER_INSTALL=mv '{destdir}/usr/bin/klaus' '{destdir}/usr/bin/klaus{version.major}'
+
 include /usr/share/dpkg/default.mk
 
 %:
-	dh $@ --with python2 --buildsystem=python_distutils
+	dh $@ --with python2,python3 --buildsystem=pybuild
+
+override_dh_auto_install:
+	dh_auto_install
+	install -d debian/tmp/usr/share/man/man1
+	install -T klaus.1 debian/tmp/usr/share/man/man1/klaus2.1
+	install -T klaus.1 debian/tmp/usr/share/man/man1/klaus3.1
 
 override_dh_auto_clean:
 	dh_auto_clean

@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+update-alternatives --install /usr/bin/klaus klaus /usr/bin/klaus2 23 \
+     --slave /usr/share/man/man1/klaus.1.gz klaus.1.gz /usr/share/man/man1/klaus2.1.gz
+
+#DEBHELPER#

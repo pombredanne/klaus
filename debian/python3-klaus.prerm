@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+if [ "$1" != "upgrade" ]
+then
+    update-alternatives --remove klaus /usr/bin/klaus3
+fi
+
+#DEBHELPER#
