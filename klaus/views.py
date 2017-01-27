@@ -19,9 +19,12 @@ else:
     CTAGS_CACHE = ctagscache.CTagsCache()
 
 from klaus import markup
-from klaus.highlighting import pygmentize
+from klaus.highlighting import highlight_or_render
 from klaus.utils import parent_directory, subpaths, force_unicode, guess_is_binary, \
                         guess_is_image, replace_dupes
+
+
+README_FILENAMES = [b'README', b'README.md', b'README.rst']
 
 
 def repo_list():
@@ -150,15 +153,14 @@ class HistoryView(TreeViewMixin, BaseRepoView):
 
         self.context['page'] = page
 
+        history_length = 30
         if page:
-            history_length = 30
             skip = (self.context['page']-1) * 30 + 10
             if page > 7:
                 self.context['previous_pages'] = [0, 1, 2, None] + list(range(page))[-3:]
             else:
                 self.context['previous_pages'] = range(page)
         else:
-            history_length = 10
             skip = 0
 
         history = self.context['repo'].history(
@@ -179,6 +181,62 @@ class HistoryView(TreeViewMixin, BaseRepoView):
             'history': history,
             'more_commits': more_commits,
         })
+
+
+class IndexView(TreeViewMixin, BaseRepoView):
+    """Show commits of a branch, just like `git log`.
+
+    Also, README, if available."""
+    template_name = 'index.html'
+
+    def _get_readme(self):
+        tree = self.context['repo'][self.context['commit'].tree]
+        for name in README_FILENAMES:
+            if name in tree:
+                readme_data = self.context['repo'][tree[name][1]].data
+                readme_filename = name
+                return (readme_filename, readme_data)
+        else:
+            raise KeyError
+
+    def make_template_context(self, *args):
+        super(IndexView, self).make_template_context(*args)
+
+        self.context['page'] = 0
+        history_length = 10
+        history = self.context['repo'].history(
+            self.context['commit'],
+            self.context['path'],
+            history_length + 1,
+            skip=0,
+        )
+        if len(history) == history_length + 1:
+            # At least one more commit for next page left
+            more_commits = True
+            # We don't want show the additional commit on this page
+            history.pop()
+        else:
+            more_commits = False
+
+        self.context.update({
+            'history': history,
+            'more_commits': more_commits,
+        })
+        try:
+            (readme_filename, readme_data) = self._get_readme()
+        except KeyError:
+            self.context.update({
+                'is_markup': None,
+                'rendered_code': None,
+            })
+        else:
+            self.context.update({
+                'is_markup': markup.can_render(readme_filename),
+                'rendered_code': highlight_or_render(
+                    force_unicode(readme_data),
+                    force_unicode(readme_filename),
+                ),
+            })
 
 
 class BaseBlobView(BaseRepoView):
@@ -214,7 +272,7 @@ class BaseFileView(TreeViewMixin, BaseBlobView):
         else:
             ctags_args = {}
 
-        return pygmentize(
+        return highlight_or_render(
             force_unicode(self.context['blob_or_tree'].data),
             self.context['filename'],
             render_markup,
@@ -308,6 +366,7 @@ class DownloadView(BaseRepoView):
 
 
 history = HistoryView.as_view('history', 'history')
+index = IndexView.as_view('index', 'index')
 commit = CommitView.as_view('commit', 'commit')
 patch = PatchView.as_view('patch', 'patch')
 blame = BlameView.as_view('blame', 'blame')
