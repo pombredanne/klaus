@@ -1,3 +1,9 @@
+klaus (1.0.1+git20170126-1) UNRELEASED; urgency=medium
+
+  * New upstream snapshot.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Fri, 27 Jan 2017 01:00:25 +0000
+
 klaus (1.0.1-1) unstable; urgency=low
 
   * New upstream release.
