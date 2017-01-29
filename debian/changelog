@@ -1,4 +1,4 @@
-klaus (1.0.1+git20170126-1) UNRELEASED; urgency=medium
+klaus (1.0.1+git20170126-1) experimental; urgency=low
 
   * New upstream snapshot.
   * Rename the klaus package to python-klaus, with klaus package as a
