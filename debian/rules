@@ -20,5 +20,8 @@ override_dh_auto_clean:
 	rm -rf klaus.egg-info
 	rm -rf tests/repos/build/
 
+override_dh_installchangelog:
+	dh_installchangelog CHANGELOG.rst
+
 override_dh_auto_test:
 	#./runtests.sh
