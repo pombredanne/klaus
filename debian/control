@@ -24,8 +24,8 @@ Description: simple easy-to-set-up Git web viewer
 
 Package: python-klaus
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-dulwich (>= 0.13.0), python-six, python-flask, python-pygments, python-humanize, python-werkzeug, python-chardet
-Recommends: python-markdown, python-chardet, python-docutils, uwsgi-plugin
+Depends: ${misc:Depends}, ${python:Depends}, python-dulwich (>= 0.13.0), python-six, python-flask, python-pygments, python-humanize, python-werkzeug
+Recommends: python-markdown, python-chardet, python-docutils
 Replaces: klaus (<= 1.0.1-1)
 Suggests: exuberant-ctags, uwsgi-plugin-python | gunicorn
 Description: simple easy-to-set-up Git web viewer
@@ -40,7 +40,7 @@ Description: simple easy-to-set-up Git web viewer
 Package: python3-klaus
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, python3-dulwich (>= 0.13.0), python3-six, python3-flask, python3-pygments, python3-humanize, python3-werkzeug, python3-chardet, python3-docutils
-Recommends: python3-markdown
+Recommends: python3-markdown, python3-chardet, python3-docutils
 Suggests: exuberant-ctags, uwsgi-plugin-python3 | gunicorn3
 Description: simple easy-to-set-up Git web viewer
  Features:
