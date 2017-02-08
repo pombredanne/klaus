@@ -1,4 +1,4 @@
-klaus (1.0.1+git20170207-1) UNRELEASED; urgency=medium
+klaus (1.0.1+git20170207-1) experimental; urgency=medium
 
   * New upstream snapshot.
    + Fixes regression while accessing main repository page.
