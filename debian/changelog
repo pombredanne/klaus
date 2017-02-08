@@ -2,6 +2,10 @@ klaus (1.0.1+git20170207-1) UNRELEASED; urgency=medium
 
   * New upstream snapshot.
    + Fixes regression while accessing main repository page.
+  * Add missing dependency on python3 to klaus.
+  * python3-klaus: Remove unnecessary depends on python3-chardet,
+    python3-docutils (already included in Recommends).
+  * Set section for python3-klaus and python-klaus to Python.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Wed, 08 Feb 2017 03:48:42 +0000
 
