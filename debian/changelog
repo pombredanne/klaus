@@ -1,3 +1,10 @@
+klaus (1.0.1+git20170207-1) UNRELEASED; urgency=medium
+
+  * New upstream snapshot.
+   + Fixes regression while accessing main repository page.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Wed, 08 Feb 2017 03:48:42 +0000
+
 klaus (1.0.1+git20170126-2) experimental; urgency=medium
 
   * Add recommends for python-chardet, python-docutils, python-markdown.
