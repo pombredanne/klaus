@@ -6,6 +6,8 @@ klaus (1.0.1+git20170126-2) UNRELEASED; urgency=medium
   * Install upstream changelog.
   * Install README.rst.
   * Add uwsgi example ini files.
+  * Add Replaces: for older klaus versions to python-klaus. Closes:
+    #854530
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 29 Jan 2017 23:14:52 +0000
 
