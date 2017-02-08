@@ -27,6 +27,7 @@ Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, python-dulwich (>= 0.13.0), python-six, python-flask, python-pygments, python-humanize, python-werkzeug
 Recommends: python-markdown, python-chardet, python-docutils
 Replaces: klaus (<= 1.0.1-1)
+Breaks: klaus (<= 1.0.1-1)
 Suggests: exuberant-ctags, uwsgi-plugin-python | gunicorn
 Description: simple easy-to-set-up Git web viewer
  Features:
