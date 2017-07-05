@@ -201,14 +201,16 @@ index 0000000..82860d0
 +    """ This thing just keeps asking for credentials all the time """
 +    def authenticate(self, environ):
 +        return False
---- klaus-0.7.1.orig/setup.py
-+++ klaus-0.7.1/setup.py
-@@ -15,7 +15,7 @@ def install_data_files_hack():
+diff --git a/setup.py b/setup.py
+index 2579760..e6e1a70 100644
+--- a/setup.py
++++ b/setup.py
+@@ -14,7 +14,7 @@ def install_data_files_hack():
  
  install_data_files_hack()
  
 -requires = ['six', 'flask', 'pygments', 'dulwich>=0.13.0', 'httpauth', 'humanize']
 +requires = ['six', 'flask', 'pygments', 'dulwich>=0.13.0', 'humanize']
  
- try:
-     import argparse  # not available for Python 2.6
+ setup(
+     name='klaus',
