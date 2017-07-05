@@ -1,13 +1,16 @@
 import os
 import io
 import stat
+import subprocess
 
+from dulwich.objects import S_ISGITLINK
 from dulwich.object_store import tree_lookup_path
+from dulwich.objects import Blob
 from dulwich.errors import NotTreeError
 import dulwich, dulwich.patch
 
-from klaus.utils import check_output, force_unicode, parent_directory, encode_for_git, decode_from_git
-from klaus.diff import prepare_udiff
+from klaus.utils import force_unicode, parent_directory, encode_for_git, decode_from_git
+from klaus.diff import render_diff
 
 
 class FancyRepo(dulwich.repo.Repo):
@@ -28,9 +31,24 @@ class FancyRepo(dulwich.repo.Repo):
         refs = [self[ref_hash] for ref_hash in self.get_refs().values()]
         refs.sort(key=lambda obj:getattr(obj, 'commit_time', float('-inf')),
                   reverse=True)
-        if refs:
-            return refs[0].commit_time
+        for ref in refs:
+            # Find the latest ref that has a commit_time; tags do not
+            # have a commit time
+            if hasattr(ref, "commit_time"):
+                return ref.commit_time
         return None
+
+    @property
+    def cloneurl(self):
+        """Retrieve the gitweb notion of the public clone URL of this repo."""
+        f = self.get_named_file('cloneurl')
+        if f is not None:
+            return f.read()
+        c = self.get_config()
+        try:
+            return force_unicode(c.get(b'gitweb', b'url'))
+        except KeyError:
+            return None
 
     def get_description(self):
         """Like Dulwich's `get_description`, but returns None if the file
@@ -123,7 +141,7 @@ class FancyRepo(dulwich.repo.Repo):
         if path:
             cmd.extend(['--', path])
 
-        output = check_output(cmd, cwd=os.path.abspath(self.path))
+        output = subprocess.check_output(cmd, cwd=os.path.abspath(self.path))
         sha1_sums = output.strip().split(b'\n')
         return [self[sha1] for sha1 in sha1_sums]
 
@@ -133,9 +151,9 @@ class FancyRepo(dulwich.repo.Repo):
         """
         # XXX see comment in `.history()`
         cmd = ['git', 'blame', '-ls', '--root', commit.id, '--', path]
-        output = check_output(cmd, cwd=os.path.abspath(self.path))
+        output = subprocess.check_output(cmd, cwd=os.path.abspath(self.path))
         sha1_sums = [line[:40] for line in output.strip().split(b'\n')]
-        return [self[sha1] for sha1 in sha1_sums]
+        return [None if self[sha1] is None else decode_from_git(self[sha1].id) for sha1 in sha1_sums]
 
     def get_blob_or_tree(self, commit, path):
         """Return the Git tree or blob object for `path` at `commit`."""
@@ -150,10 +168,13 @@ class FancyRepo(dulwich.repo.Repo):
 
     def listdir(self, commit, path):
         """Return a list of directories and files in given directory."""
-        dirs, files = [], []
+        submodules, dirs, files = [], [], []
         for entry in self.get_blob_or_tree(commit, path).items():
             name, entry = entry.path, entry.in_path(encode_for_git(path))
-            if entry.mode & stat.S_IFDIR:
+            if S_ISGITLINK(entry.mode):
+                submodules.append(
+                    (name.lower(), name, entry.path, entry.sha))
+            elif stat.S_ISDIR(entry.mode):
                 dirs.append((name.lower(), name, entry.path))
             else:
                 files.append((name.lower(), name, entry.path))
@@ -163,7 +184,7 @@ class FancyRepo(dulwich.repo.Repo):
         if path:
             dirs.insert(0, (None, '..', parent_directory(path)))
 
-        return {'dirs' : dirs, 'files' : files}
+        return {'submodules': submodules, 'dirs' : dirs, 'files' : files}
 
     def commit_diff(self, commit):
         """Return the list of changes introduced by `commit`."""
@@ -180,43 +201,38 @@ class FancyRepo(dulwich.repo.Repo):
         dulwich_changes = self.object_store.tree_changes(parent_tree, commit.tree)
         for (oldpath, newpath), (oldmode, newmode), (oldsha, newsha) in dulwich_changes:
             summary['nfiles'] += 1
-
             try:
-                # Check for binary files -- can't show diffs for these
-                if newsha and guess_is_binary(self[newsha]) or \
-                   oldsha and guess_is_binary(self[oldsha]):
-                    file_changes.append({
-                        'is_binary': True,
-                        'old_filename': oldpath or '/dev/null',
-                        'new_filename': newpath or '/dev/null',
-                        'chunks': None
-                    })
-                    continue
+                oldblob = self.object_store[oldsha] if oldsha else Blob.from_string(b'')
+                newblob = self.object_store[newsha] if newsha else Blob.from_string(b'')
             except KeyError:
                 # newsha/oldsha are probably related to submodules.
                 # Dulwich will handle that.
                 pass
 
-            bytesio = io.BytesIO()
-            dulwich.patch.write_object_diff(bytesio, self.object_store,
-                                            (oldpath, oldmode, oldsha),
-                                            (newpath, newmode, newsha))
-            files = prepare_udiff(decode_from_git(bytesio.getvalue()), want_header=False)
-            if not files:
-                # the diff module doesn't handle deletions/additions
-                # of empty files correctly.
+            # Check for binary files -- can't show diffs for these
+            if guess_is_binary(newblob) or \
+               guess_is_binary(oldblob):
                 file_changes.append({
+                    'is_binary': True,
                     'old_filename': oldpath or '/dev/null',
                     'new_filename': newpath or '/dev/null',
-                    'chunks': [],
-                    'additions': 0,
-                    'deletions': 0,
+                    'chunks': None
                 })
-            else:
-                change = files[0]
-                summary['nadditions'] += change['additions']
-                summary['ndeletions'] += change['deletions']
-                file_changes.append(change)
+                continue
+
+            additions, deletions, chunks = render_diff(
+                oldblob.splitlines(), newblob.splitlines())
+            change = {
+                'is_binary': False,
+                'old_filename': oldpath or '/dev/null',
+                'new_filename': newpath or '/dev/null',
+                'chunks': chunks,
+                'additions': additions,
+                'deletions': deletions,
+            }
+            summary['nadditions'] += additions
+            summary['ndeletions'] += deletions
+            file_changes.append(change)
 
         return summary, file_changes
 

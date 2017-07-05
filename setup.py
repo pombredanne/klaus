@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-import glob
 from setuptools import setup
 
 
@@ -17,15 +16,9 @@ install_data_files_hack()
 
 requires = ['six', 'flask', 'pygments', 'dulwich>=0.13.0', 'humanize']
 
-try:
-    import argparse  # not available for Python 2.6
-except ImportError:
-    requires.append('argparse')
-
-
 setup(
     name='klaus',
-    version='1.0.1',
+    version='1.2.1',
     author='Jonas Haag',
     author_email='jonas@lophus.org',
     packages=['klaus', 'klaus.contrib'],
@@ -44,7 +37,6 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: ISC License (ISCL)",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
     ],
     install_requires=requires,

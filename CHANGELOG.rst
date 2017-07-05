@@ -1,6 +1,30 @@
 Changelog
 =========
 
+1.2.1 (Jul 5, 2017)
+-------------------
+- SECURITY ISSUE, PLEASE UPDATE: Fix #200: Missing HTML escaping in diff view
+- #189: Submodule info page instead of server error (Jelmer Vernooĳ)
+- #187, #191, #165: Bug fixes (Chris St. Pierre, Aleksey Rybalkin)
+
+1.2.0 (Jun 13, 2017)
+--------------------
+* #177: Fix relative links in READMEs (etc.) (Jelmer Vernooĳ)
+* #36: Allow for branch names with ``/``, e.g. ``feature/foobar`` (Martin Zimmermann, Chris St. Pierre)
+* #184: Drop support for Python 2.6 (Jelmer Vernooĳ)
+* Refactor diff generating code (Jelmer Vernooĳ)
+* Fix temporary files not being deleted (Jonas Haag)
+
+1.1.0 (Feb 1, 2017)
+-------------------
+* Display README on repository landing page (Jelmer Vernooĳ)
+* Make all options configurable using environment variables (Jimmy Petersson)
+* #122: Support `.git/cloneurl` and `gitweb.url` settings (Jelmer Vernooĳ)
+* Support ".mdwn" markdown file extension (Jelmer Vernooĳ)
+* #166: Set device viewport (Jonas Haag)
+* Fix autoreloader with Python (Jimmy Petersson)
+* #169: Fix htdigest with autoreloader (Jimmy Petersson)
+
 1.0.1 (May 24, 2016)
 ---------------------
 * Full support for Python 3 (Louis Sautier, Jonas Haag)
@@ -79,7 +103,7 @@ Changelog
 * Bugfix release for bugfix release 0.4.4. (Daniel Krüger, Jonas Haag)
 
 0.4.4 (Feb 21, 2014)
--------------------
+--------------------
 * Fix syntax highlighting in case multiple different file formats share the
   same file extension.  Rely on Pygments to select the best matching lexer for us.
   (Gnewbee, Jonas Haag)

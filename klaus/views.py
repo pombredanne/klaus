@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import sys
 
@@ -9,6 +10,8 @@ from werkzeug.exceptions import NotFound
 
 import dulwich.objects
 import dulwich.archive
+import dulwich.config
+from dulwich.object_store import tree_lookup_path
 
 try:
     import ctags
@@ -19,9 +22,12 @@ else:
     CTAGS_CACHE = ctagscache.CTagsCache()
 
 from klaus import markup
-from klaus.highlighting import pygmentize
+from klaus.highlighting import highlight_or_render
 from klaus.utils import parent_directory, subpaths, force_unicode, guess_is_binary, \
-                        guess_is_image, replace_dupes
+                        guess_is_image, replace_dupes, sanitize_branch_name, encode_for_git
+
+
+README_FILENAMES = [b'README', b'README.md', b'README.rst']
 
 
 def repo_list():
@@ -33,7 +39,8 @@ def repo_list():
         sort_key = lambda repo: repo.name
         reverse = False
     repos = sorted(current_app.repos.values(), key=sort_key, reverse=reverse)
-    return render_template('repo_list.html', repos=repos)
+    return render_template('repo_list.html', repos=repos, base_href=None)
+
 
 
 def robots_txt():
@@ -41,7 +48,10 @@ def robots_txt():
     return current_app.send_static_file('robots.txt')
 
 
-def _get_repo_and_rev(repo, rev=None):
+def _get_repo_and_rev(repo, rev=None, path=None):
+    if path and rev:
+        rev += "/" + path.rstrip("/")
+
     try:
         repo = current_app.repos[repo]
     except KeyError:
@@ -51,12 +61,32 @@ def _get_repo_and_rev(repo, rev=None):
         rev = repo.get_default_branch()
         if rev is None:
             raise NotFound("Empty repository")
-    try:
-        commit = repo.get_commit(rev)
-    except KeyError:
+
+    i = len(rev)
+    while i > 0:
+        try:
+            commit = repo.get_commit(rev[:i])
+            path = rev[i:].strip("/")
+            rev = rev[:i]
+        except (KeyError, IOError):
+            i = rev.rfind("/", 0, i)
+        else:
+            break
+    else:
         raise NotFound("No such commit %r" % rev)
 
-    return repo, rev, commit
+    return repo, rev, path, commit
+
+
+def _get_submodule(repo, commit, path):
+    """Retrieve submodule URL and path."""
+    submodule_blob = repo.get_blob_or_tree(commit, '.gitmodules')
+    config = dulwich.config.ConfigFile.from_file(
+        BytesIO(submodule_blob.as_raw_string()))
+    key = (b'submodule', path)
+    submodule_url = config.get(key, b'url')
+    submodule_path = config.get(key, b'path')
+    return (submodule_url, submodule_path)
 
 
 class BaseRepoView(View):
@@ -76,6 +106,18 @@ class BaseRepoView(View):
         self.context = {}
 
     def dispatch_request(self, repo, rev=None, path=''):
+        """Dispatch repository, revision (if any) and path (if any). To retain
+        compatibility with :func:`url_for`, view routing uses two arguments:
+        rev and path, although a single path is sufficient (from Git's point of
+        view, '/foo/bar/baz' may be a branch '/foo/bar' containing baz, or a
+        branch '/foo' containing 'bar/baz', but never both [1].
+
+        Hence, rebuild rev and path to a single path argument, which is then
+        later split into rev and path again, but revision now may contain
+        slashes.
+
+        [1] https://github.com/jonashaag/klaus/issues/36#issuecomment-23990266
+        """
         self.make_template_context(repo, rev, path.strip('/'))
         return self.get_response()
 
@@ -83,7 +125,8 @@ class BaseRepoView(View):
         return render_template(self.template_name, **self.context)
 
     def make_template_context(self, repo, rev, path):
-        repo, rev, commit = _get_repo_and_rev(repo, rev)
+        repo, rev, path, commit = _get_repo_and_rev(repo, rev, path)
+
         try:
             blob_or_tree = repo.get_blob_or_tree(commit, path)
         except KeyError:
@@ -99,6 +142,7 @@ class BaseRepoView(View):
             'path': path,
             'blob_or_tree': blob_or_tree,
             'subpaths': list(subpaths(path)) if path else None,
+            'base_href': None,
         }
 
 
@@ -150,15 +194,14 @@ class HistoryView(TreeViewMixin, BaseRepoView):
 
         self.context['page'] = page
 
+        history_length = 30
         if page:
-            history_length = 30
             skip = (self.context['page']-1) * 30 + 10
             if page > 7:
                 self.context['previous_pages'] = [0, 1, 2, None] + list(range(page))[-3:]
             else:
                 self.context['previous_pages'] = range(page)
         else:
-            history_length = 10
             skip = 0
 
         history = self.context['repo'].history(
@@ -181,12 +224,115 @@ class HistoryView(TreeViewMixin, BaseRepoView):
         })
 
 
+class IndexView(TreeViewMixin, BaseRepoView):
+    """Show commits of a branch, just like `git log`.
+
+    Also, README, if available."""
+    template_name = 'index.html'
+
+    def _get_readme(self):
+        tree = self.context['repo'][self.context['commit'].tree]
+        for name in README_FILENAMES:
+            if name in tree:
+                readme_data = self.context['repo'][tree[name][1]].data
+                readme_filename = name
+                return (readme_filename, readme_data)
+        else:
+            raise KeyError
+
+    def make_template_context(self, *args):
+        super(IndexView, self).make_template_context(*args)
+
+        self.context['base_href'] = url_for(
+            'blob',
+            repo=self.context['repo'].name,
+            rev=self.context['rev'],
+            path=''
+        )
+
+        self.context['page'] = 0
+        history_length = 10
+        history = self.context['repo'].history(
+            self.context['commit'],
+            self.context['path'],
+            history_length + 1,
+            skip=0,
+        )
+        if len(history) == history_length + 1:
+            # At least one more commit for next page left
+            more_commits = True
+            # We don't want show the additional commit on this page
+            history.pop()
+        else:
+            more_commits = False
+
+        self.context.update({
+            'history': history,
+            'more_commits': more_commits,
+        })
+        try:
+            (readme_filename, readme_data) = self._get_readme()
+        except KeyError:
+            self.context.update({
+                'is_markup': None,
+                'rendered_code': None,
+            })
+        else:
+            self.context.update({
+                'is_markup': markup.can_render(readme_filename),
+                'rendered_code': highlight_or_render(
+                    force_unicode(readme_data),
+                    force_unicode(readme_filename),
+                ),
+            })
+
+
 class BaseBlobView(BaseRepoView):
     def make_template_context(self, *args):
         super(BaseBlobView, self).make_template_context(*args)
         if not isinstance(self.context['blob_or_tree'], dulwich.objects.Blob):
             raise NotFound("Not a blob")
         self.context['filename'] = os.path.basename(self.context['path'])
+
+
+class SubmoduleView(BaseRepoView):
+    """Show an information page about a submodule."""
+    template_name = 'submodule.html'
+
+    def make_template_context(self, repo, rev, path):
+        repo, rev, path, commit = _get_repo_and_rev(repo, rev, path)
+
+        try:
+            submodule_rev = tree_lookup_path(
+                repo.__getitem__, commit.tree, encode_for_git(path))[1]
+        except KeyError:
+            raise NotFound("Parent path for submodule missing")
+
+        try:
+            (submodule_url, submodule_path) = _get_submodule(
+                repo, commit, encode_for_git(path))
+        except KeyError:
+            submodule_url = None
+            submodule_path = None
+
+        # TODO(jelmer): Rather than printing an information page,
+        # redirect to the page in klaus for the repository at
+        # submodule_path, revision submodule_rev.
+
+        self.context = {
+            'view': self.view_name,
+            'repo': repo,
+            'rev': rev,
+            'commit': commit,
+            'branches': repo.get_branch_names(exclude=rev),
+            'tags': repo.get_tag_names(),
+            'path': path,
+            'subpaths': list(subpaths(path)) if path else None,
+            'submodule_url': force_unicode(submodule_url),
+            'submodule_path': force_unicode(submodule_path),
+            'submodule_rev': force_unicode(submodule_rev),
+            'base_href': None,
+        }
 
 
 class BaseFileView(TreeViewMixin, BaseBlobView):
@@ -214,7 +360,7 @@ class BaseFileView(TreeViewMixin, BaseBlobView):
         else:
             ctags_args = {}
 
-        return pygmentize(
+        return highlight_or_render(
             force_unicode(self.context['blob_or_tree'].data),
             self.context['filename'],
             render_markup,
@@ -288,7 +434,8 @@ class RawView(BaseBlobView):
 class DownloadView(BaseRepoView):
     """Download a repo as a tar.gz file."""
     def get_response(self):
-        tarname = "%s@%s.tar.gz" % (self.context['repo'].name, self.context['rev'])
+        tarname = "%s@%s.tar.gz" % (self.context['repo'].name,
+                                    sanitize_branch_name(self.context['rev']))
         headers = {
             'Content-Disposition': "attachment; filename=%s" % tarname,
             'Cache-Control': "no-store",  # Disables browser caching
@@ -308,9 +455,11 @@ class DownloadView(BaseRepoView):
 
 
 history = HistoryView.as_view('history', 'history')
+index = IndexView.as_view('index', 'index')
 commit = CommitView.as_view('commit', 'commit')
 patch = PatchView.as_view('patch', 'patch')
 blame = BlameView.as_view('blame', 'blame')
 blob = FileView.as_view('blob', 'blob')
 raw = RawView.as_view('raw', 'raw')
 download = DownloadView.as_view('download', 'download')
+submodule = SubmoduleView.as_view('submodule', 'submodule')
