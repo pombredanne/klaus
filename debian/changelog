@@ -1,4 +1,4 @@
-klaus (1.2.1-2) UNRELEASED; urgency=medium
+klaus (1.2.1-2) unstable; urgency=high
 
   * Pull in changes from experimental, including package split.
 
