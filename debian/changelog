@@ -1,9 +1,48 @@
+klaus (1.2.1-2) UNRELEASED; urgency=medium
+
+  * Pull in changes from experimental, including package split.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Thu, 06 Jul 2017 01:13:35 +0000
+
 klaus (1.2.1-1) unstable; urgency=medium
 
   * New upstream release.
   * Bump standards version to 4.0.0 (no changes).
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Wed, 05 Jul 2017 18:57:31 +0000
+
+klaus (1.0.1+git20170207-1) experimental; urgency=medium
+
+  * New upstream snapshot.
+   + Fixes regression while accessing main repository page.
+  * Add missing dependency on python3 to klaus.
+  * python3-klaus: Remove unnecessary depends on python3-chardet,
+    python3-docutils (already included in Recommends).
+  * Set section for python3-klaus and python-klaus to Python.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Wed, 08 Feb 2017 03:48:42 +0000
+
+klaus (1.0.1+git20170126-2) experimental; urgency=medium
+
+  * Add recommends for python-chardet, python-docutils, python-markdown.
+  * Move klaus binary back into 'klaus' application package. Keep
+    python3-klaus/python-klaus packages for those using klaus as a library.
+  * Install upstream changelog.
+  * Install README.rst.
+  * Add uwsgi example ini files.
+  * Add Replaces: for older klaus versions to python-klaus.
+    Closes: #854530
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 29 Jan 2017 23:14:52 +0000
+
+klaus (1.0.1+git20170126-1) experimental; urgency=low
+
+  * New upstream snapshot.
+  * Rename the klaus package to python-klaus, with klaus package as a
+    transitional package.
+  * Add python3-klaus package.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Fri, 27 Jan 2017 01:00:25 +0000
 
 klaus (1.0.1-1) unstable; urgency=low
 

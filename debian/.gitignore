@@ -4,5 +4,7 @@
 *.substvars
 files
 klaus/
+python-klaus/
+python3-klaus/
 tmp/
 debhelper-build-stamp

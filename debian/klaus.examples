@@ -1,0 +1,2 @@
+debian/uwsgi.ini
+debian/uwsgi-autoreload.ini

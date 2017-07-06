@@ -1,8 +1,8 @@
 import jinja2
 import flask
-import httpauth
 import dulwich.web
 from klaus import views, utils
+from klaus import httpauth
 from klaus.repo import FancyRepo
 
 
