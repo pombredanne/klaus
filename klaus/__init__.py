@@ -1,12 +1,12 @@
 import jinja2
 import flask
+import httpauth
 import dulwich.web
 from klaus import views, utils
-from klaus import httpauth
 from klaus.repo import FancyRepo
 
 
-KLAUS_VERSION = utils.guess_git_revision() or '1.2.1'
+KLAUS_VERSION = utils.guess_git_revision() or '1.3.0'
 
 
 class Klaus(flask.Flask):
