@@ -5,8 +5,8 @@ Maintainer: Jelmer Vernooĳ <jelmer@debian.org>
 Build-Depends-Indep: debhelper (>= 9), python-all (>= 2.6.6-3), python3-all, python-dulwich (>= 0.19.3), python3-dulwich, python-six, python3-six, python-flask, python3-flask, python-pygments, python3-pygments, python-humanize, python3-humanize, python-requests, python3-requests, python-werkzeug, python3-werkzeug, exuberant-ctags, dh-python, python-setuptools, python3-setuptools, python-markdown, python3-markdown, python-chardet, python3-chardet, python3-docutils, python-docutils
 Standards-Version: 4.1.4
 Homepage: https://github.com/jonashaag/klaus
-Vcs-Git: git://salsa.debian.org/collab-maint/klaus.git -b experimental
-Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/klaus.git;a=summary
+Vcs-Git: https://salsa.debian.org/jelmer/klaus.git
+Vcs-Browser: https://salsa.debian.org/jelmer/klaus.git
 
 Package: klaus
 Architecture: all
