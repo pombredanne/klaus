@@ -209,8 +209,8 @@ index 2579760..e6e1a70 100644
  
  install_data_files_hack()
  
--requires = ['six', 'flask', 'pygments', 'dulwich>=0.13.0', 'httpauth', 'humanize']
-+requires = ['six', 'flask', 'pygments', 'dulwich>=0.13.0', 'humanize']
+-requires = ['six', 'flask', 'pygments', 'dulwich>=0.19.3', 'httpauth', 'humanize']
++requires = ['six', 'flask', 'pygments', 'dulwich>=0.19.3', 'humanize']
  
  setup(
      name='klaus',
