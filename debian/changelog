@@ -3,6 +3,7 @@ klaus (1.3.0-1) UNRELEASED; urgency=medium
   * Add debian/watch file.
   * New upstream release.
   * Bump standards version to 4.1.4 (no changes).
+  * Bump dulwich version to 0.19.3.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Tue, 19 Jun 2018 19:25:25 +0100
 
