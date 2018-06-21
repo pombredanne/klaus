@@ -1,4 +1,5 @@
 # encoding: utf-8
+from dulwich.repo import Repo
 import os
 import re
 import time
@@ -6,7 +7,6 @@ import datetime
 import mimetypes
 import locale
 import warnings
-import subprocess
 import six
 try:
     import chardet
@@ -220,16 +220,13 @@ def guess_git_revision():
     This is used to display the "powered by klaus $VERSION" footer on each page,
     $VERSION being either the SHA guessed by this function or the latest release number.
     """
-    git_dir = os.path.join(os.path.dirname(__file__), '..', '.git')
+    git_dir = os.path.join(os.path.dirname(__file__), '..')
     try:
-        return force_unicode(subprocess.check_output(
-            ['git', 'log', '--format=%h', '-n', '1'],
-            cwd=git_dir
-        ).strip())
-    except OSError:
-        # Either the git executable couldn't be found in the OS's PATH
-        # or no ".git" directory exists, i.e. this is no "bleeding-edge" installation.
+        r = Repo(git_dir)
+    except NotGitRepository:
         return None
+    else:
+        return force_unicode(r.head()[:8])
 
 
 def sanitize_branch_name(name, chars='./', repl='-'):
