@@ -1,4 +1,4 @@
-klaus (1.3.0-2) UNRELEASED; urgency=medium
+klaus (1.3.0-2) unstable; urgency=medium
 
   * Bundle klaus.1 in debian/, which isn't shipped upstream. Fixes FTBFS.
     Closes: #904911
