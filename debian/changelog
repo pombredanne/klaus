@@ -3,6 +3,8 @@ klaus (1.3.0-3) UNRELEASED; urgency=medium
   * Add debian/upstream/metadata.
   * debian/uwsgi.ini: Use : rather than space to separate repository paths in
     example. Closes: #927686
+  * Add recommends on python3-distutils, which is necessary for
+    the klaus.contrib.wsgi module. Closes: #927685
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 09 Sep 2018 05:22:32 +0100
 
