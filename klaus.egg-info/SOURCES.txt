@@ -1,5 +1,6 @@
 MANIFEST.in
 README.rst
+klaus.1
 setup.py
 bin/klaus
 klaus/__init__.py

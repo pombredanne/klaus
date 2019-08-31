@@ -27,18 +27,16 @@ from klaus.utils import parent_directory, subpaths, force_unicode, guess_is_bina
                         guess_is_image, replace_dupes, sanitize_branch_name, encode_for_git
 
 
-README_FILENAMES = [b'README', b'README.md', b'README.rst']
+README_FILENAMES = [b'README', b'README.md', b'README.mkdn', b'README.mdwn', b'README.markdown', b'README.rst']
 
 
 def repo_list():
     """Show a list of all repos and can be sorted by last update."""
-    if 'by-last-update' in request.args:
-        sort_key = lambda repo: repo.get_last_updated_at()
-        reverse = True
-    else:
+    if 'by-name' in request.args:
         sort_key = lambda repo: repo.name
-        reverse = False
-    repos = sorted(current_app.repos.values(), key=sort_key, reverse=reverse)
+    else:
+        sort_key = lambda repo: (-(repo.get_last_updated_at() or -1), repo.name)
+    repos = sorted(current_app.repos.values(), key=sort_key)
     return render_template('repo_list.html', repos=repos, base_href=None)
 
 
@@ -278,12 +276,11 @@ class IndexView(TreeViewMixin, BaseRepoView):
                 'rendered_code': None,
             })
         else:
+            readme_filename = force_unicode(readme_filename) 
+            readme_data = force_unicode(readme_data)
             self.context.update({
                 'is_markup': markup.can_render(readme_filename),
-                'rendered_code': highlight_or_render(
-                    force_unicode(readme_data),
-                    force_unicode(readme_filename),
-                ),
+                'rendered_code': highlight_or_render(readme_data, readme_filename)
             })
 
 
