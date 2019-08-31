@@ -8,6 +8,7 @@ klaus (1.4.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * Drop Python 2 support. Closes: #936801
   * Drop unnecessary dependency on build-essential.
+  * debian/control: Remove empty control field Build-Depends.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sat, 31 Aug 2019 09:43:35 +0000
 
