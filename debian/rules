@@ -6,14 +6,7 @@ export PYBUILD_NAME=klaus
 include /usr/share/dpkg/default.mk
 
 %:
-	dh $@ --with python2,python3 --buildsystem=pybuild
-
-override_dh_auto_install:
-	dh_auto_install
-	rm debian/python-klaus/usr/bin/klaus
-	mkdir -p debian/klaus/usr/bin
-	mv debian/python3-klaus/usr/bin/klaus \
-	   debian/klaus/usr/bin/klaus
+	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_auto_clean:
 	dh_auto_clean
