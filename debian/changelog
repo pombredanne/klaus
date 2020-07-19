@@ -1,6 +1,8 @@
 klaus (1.5.2-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 19 Jul 2020 22:13:34 +0000
 
