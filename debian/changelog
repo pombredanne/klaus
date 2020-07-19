@@ -4,6 +4,7 @@ klaus (1.5.2-1) UNRELEASED; urgency=medium
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
     Repository-Browse.
   * Refer to specific version of license GPL-3+.
+  * Update standards version to 4.5.0, no changes needed.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 19 Jul 2020 22:13:34 +0000
 
