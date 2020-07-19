@@ -1,4 +1,4 @@
-klaus (1.5.2-1) UNRELEASED; urgency=medium
+klaus (1.5.2-1) unstable; urgency=medium
 
   * New upstream release.
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
@@ -7,7 +7,7 @@ klaus (1.5.2-1) UNRELEASED; urgency=medium
   * Update standards version to 4.5.0, no changes needed.
   * Refresh patch 01_httpauth.
 
- -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 19 Jul 2020 22:13:34 +0000
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 19 Jul 2020 22:15:41 +0000
 
 klaus (1.4.0-1) unstable; urgency=medium
 
