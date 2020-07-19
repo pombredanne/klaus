@@ -1,3 +1,9 @@
+klaus (1.5.2-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 19 Jul 2020 22:13:34 +0000
+
 klaus (1.4.0-1) unstable; urgency=medium
 
   * Add debian/upstream/metadata.
