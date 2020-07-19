@@ -1,5 +1,6 @@
 six
 flask
+Werkzeug>=0.15.0
 pygments
 dulwich>=0.19.3
 httpauth

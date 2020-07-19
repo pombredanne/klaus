@@ -9,32 +9,53 @@ from dulwich.objects import Blob
 from dulwich.errors import NotTreeError
 import dulwich, dulwich.patch
 
-from klaus.utils import force_unicode, parent_directory, encode_for_git, decode_from_git
+from klaus.utils import force_unicode, parent_directory, repo_human_name, \
+                        encode_for_git, decode_from_git
 from klaus.diff import render_diff
+
+
+NOT_SET = '__not_set__'
+
+
+def cached_call(key, validator, producer, _cache={}):
+    data, old_validator = _cache.get(key, (None, NOT_SET))
+    if old_validator != validator:
+        data = producer()
+    _cache[key] = (data, validator)
+    return data
 
 
 class FancyRepo(dulwich.repo.Repo):
     """A wrapper around Dulwich's Repo that adds some helper methods."""
-    # TODO: factor out stuff into dulwich
     @property
     def name(self):
-        """Get repository name from path.
+        return repo_human_name(self.path)
 
-        1. /x/y.git -> /x/y  and  /x/y/.git/ -> /x/y//
-        2. /x/y/ -> /x/y
-        3. /x/y -> y
-        """
-        path = self.path.rstrip(os.sep).split(os.sep)[-1]
-        if path.endswith('.git'):
-            path = path[:-4]
-        return path
-
+    # TODO: factor out stuff into dulwich
     def get_last_updated_at(self):
         """Get datetime of last commit to this repository."""
-        refs = [self[ref_hash] for ref_hash in self.get_refs().values()]
-        refs.sort(key=lambda obj:getattr(obj, 'commit_time', float('-inf')),
-                  reverse=True)
-        for ref in refs:
+        # Cache result to speed up repo_list.html template.
+        # If self.get_refs() has changed, we should invalidate the cache.
+        all_refs = self.get_refs()
+        return cached_call(
+            key=(id(self), 'get_last_updated_at'),
+            validator=all_refs,
+            producer=lambda: self._get_last_updated_at(all_refs)
+        )
+
+    def _get_last_updated_at(self, all_refs):
+        resolveable_refs = []
+        for ref_hash in all_refs:
+            try:
+                resolveable_refs.append(self[ref_hash])
+            except KeyError:
+                # Whoops. The ref points at a non-existant object
+                pass
+        resolveable_refs.sort(
+            key=lambda obj:getattr(obj, 'commit_time', float('-inf')),
+            reverse=True
+        )
+        for ref in resolveable_refs:
             # Find the latest ref that has a commit_time; tags do not
             # have a commit time
             if hasattr(ref, "commit_time"):
@@ -57,6 +78,21 @@ class FancyRepo(dulwich.repo.Repo):
         """Like Dulwich's `get_description`, but returns None if the file
         contains Git's default text "Unnamed repository[...]".
         """
+        # Cache result to speed up repo_list.html template.
+        # If description file mtime has changed, we should invalidate the cache.
+        description_file = os.path.join(self._controldir, 'description')
+        try:
+            description_mtime = os.stat(os.path.join(self._controldir, 'description')).st_mtime
+        except OSError:
+            description_mtime = None
+
+        return cached_call(
+            key=(id(self), 'get_description'),
+            validator=description_mtime,
+            producer=self._get_description
+        )
+
+    def _get_description(self):
         description = super(FancyRepo, self).get_description()
         if description:
             description = force_unicode(description)
@@ -94,7 +130,12 @@ class FancyRepo(dulwich.repo.Repo):
         time they have been committed to last.
         """
         def get_commit_time(refname):
-            obj = self[refs[refname]]
+            try:
+                obj = self[refs[refname]]
+            except KeyError:
+                # Default to 0, i.e. sorting refs that point at non-existant
+                # objects last.
+                return 0
             if isinstance(obj, dulwich.objects.Tag):
                 return obj.tag_time
             return obj.commit_time
@@ -255,3 +296,38 @@ class FancyRepo(dulwich.repo.Repo):
         bytesio = io.BytesIO()
         dulwich.patch.write_tree_diff(bytesio, self.object_store, parent_tree, commit.tree)
         return bytesio.getvalue()
+
+    def freeze(self):
+        return FrozenFancyRepo(self)
+
+
+class FrozenFancyRepo(object):
+    """A special version of FancyRepo that assumes the underlying Git
+    repository does not change.  Used for performance optimizations.
+    """
+    def __init__(self, repo):
+        self.__repo = repo
+        self.__last_updated_at = NOT_SET
+
+    def __setattr__(self, name, value):
+        if not name.startswith('_FrozenFancyRepo__'):
+            raise TypeError("Can't set %s attribute on FrozenFancyRepo" % name)
+        super(FrozenFancyRepo, self).__setattr__(name, value)
+
+    def __getattr__(self, name):
+        return getattr(self.__repo, name)
+
+    def fast_get_last_updated_at(self):
+        if self.__last_updated_at is NOT_SET:
+            self.__last_updated_at = self.__repo.get_last_updated_at()
+        return self.__last_updated_at
+
+
+class InvalidRepo:
+    """Represent an invalid repository and store pertinent data."""
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def name(self):
+        return repo_human_name(self.path)
