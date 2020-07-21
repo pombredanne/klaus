@@ -1,3 +1,9 @@
+klaus (1.5.2-2) UNRELEASED; urgency=low
+
+  * Set Rules-Requires-Root: no.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Tue, 21 Jul 2020 00:40:43 -0000
+
 klaus (1.5.2-1) unstable; urgency=medium
 
   * New upstream release.

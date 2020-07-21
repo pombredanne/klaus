@@ -8,6 +8,7 @@ Homepage: https://github.com/jonashaag/klaus
 Vcs-Git: https://salsa.debian.org/jelmer/klaus.git
 Vcs-Browser: https://salsa.debian.org/jelmer/klaus
 Build-Depends: debhelper-compat (= 12)
+Rules-Requires-Root: no
 
 Package: klaus
 Architecture: all
