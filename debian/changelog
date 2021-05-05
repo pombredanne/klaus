@@ -1,4 +1,4 @@
-klaus (1.5.2-2) UNRELEASED; urgency=low
+klaus (1.5.2-2) unstable; urgency=low
 
   * Set Rules-Requires-Root: no.
   * Fix field name typo in debian/upstream/metadata (Repository-Browser =>
@@ -6,7 +6,7 @@ klaus (1.5.2-2) UNRELEASED; urgency=low
   * Update watch file format version to 4.
   * Fix 500 when authentication is required. Closes: #987951
 
- -- Jelmer Vernooĳ <jelmer@debian.org>  Tue, 21 Jul 2020 00:40:43 -0000
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Wed, 05 May 2021 16:38:43 +0100
 
 klaus (1.5.2-1) unstable; urgency=medium
 
