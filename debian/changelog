@@ -3,6 +3,7 @@ klaus (1.5.2-2) UNRELEASED; urgency=low
   * Set Rules-Requires-Root: no.
   * Fix field name typo in debian/upstream/metadata (Repository-Browser =>
     Repository-Browse).
+  * Update watch file format version to 4.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Tue, 21 Jul 2020 00:40:43 -0000
 
