@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..82860d0
 --- /dev/null
 +++ b/klaus/httpauth.py
-@@ -0,0 +1,197 @@
+@@ -0,0 +1,198 @@
 +"""
 +Copyright (c) 2012 Jonas Haag <jonas@lophus.org>. License: ISC
 +
@@ -138,7 +138,8 @@ index 0000000..82860d0
 +            '401 Authentication Required',
 +            [('WWW-Authenticate', make_www_authenticate_header(self.realm))],
 +        )
-+        return ['<h1>401 - Authentication Required</h1>']
++        html = '<h1>401 - Authentication Required</h1>'
++        return [html if PY2 else html.encode()]
 +
 +
 +class DigestFileHttpAuthMiddleware(BaseHttpAuthMiddleware):
