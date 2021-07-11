@@ -1,19 +1,8 @@
 klaus (1.5.2-4) UNRELEASED; urgency=medium
 
-  * Wrap long lines in changelog entries: 1.5.2-3.
+  * Source-only upload.
 
  -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 11 Jul 2021 20:23:37 -0000
-
-klaus (1.5.2-3) unstable; urgency=medium
-
-  [ Debian Janitor ]
-  * Update standards version to 4.4.1, no changes needed.
-  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
-    Repository-Browse.
-  * Refer to specific version of license GPL-3+.
-  * Update standards version to 4.5.0, no changes needed.
-
- -- Jelmer Vernooĳ <jelmer@debian.org>  Sat, 12 Jun 2021 12:02:39 +0100
 
 klaus (1.5.2-2) unstable; urgency=low
 
