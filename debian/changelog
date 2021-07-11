@@ -1,8 +1,8 @@
-klaus (1.5.2-4) UNRELEASED; urgency=medium
+klaus (1.5.2-4) unstable; urgency=medium
 
   * Source-only upload.
 
- -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 11 Jul 2021 20:23:37 -0000
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 11 Jul 2021 20:32:42 +0100
 
 klaus (1.5.2-2) unstable; urgency=low
 
