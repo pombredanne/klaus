@@ -3,7 +3,7 @@ import io
 import stat
 import subprocess
 
-from dulwich.objects import S_ISGITLINK
+from dulwich.objects import S_ISGITLINK, EmptyFileException
 from dulwich.object_store import tree_lookup_path
 from dulwich.objects import Blob
 from dulwich.errors import NotTreeError
@@ -161,7 +161,7 @@ class FancyRepo(dulwich.repo.Repo):
         def get_commit_time(refname):
             try:
                 obj = self[refs[refname]]
-            except InaccessibleRef:
+            except (InaccessibleRef, EmptyFileException):
                 # Default to 0, i.e. sorting refs that point at non-existant
                 # objects last.
                 return 0
