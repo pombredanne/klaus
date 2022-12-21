@@ -15,6 +15,28 @@ from klaus.repo import FancyRepo, InvalidRepo
 KLAUS_VERSION = utils.guess_git_revision() or "2.0.2"
 
 
+ROUTES = [
+    ('repo_list',   '/'),
+    ('robots_txt',  '/robots.txt/'),
+    ('blob',        '/<repo>/blob/'),
+    ('blob',        '/<repo>/blob/<rev>/<path:path>'),
+    ('blame',       '/<repo>/blame/'),
+    ('blame',       '/<repo>/blame/<rev>/<path:path>'),
+    ('raw',         '/<repo>/raw/<path:path>/'),
+    ('raw',         '/<repo>/raw/<rev>/<path:path>'),
+    ('submodule',   '/<repo>/submodule/<rev>/'),
+    ('submodule',   '/<repo>/submodule/<rev>/<path:path>'),
+    ('commit',      '/<repo>/commit/<path:rev>/'),
+    ('patch',       '/<repo>/commit/<path:rev>.diff'),
+    ('patch',       '/<repo>/commit/<path:rev>.patch'),
+    ('index',       '/<repo>/'),
+    ('index',       '/<repo>/<path:rev>'),
+    ('history',     '/<repo>/tree/<rev>/'),
+    ('history',     '/<repo>/tree/<rev>/<path:path>'),
+    ('download',    '/<repo>/tarball/<path:rev>/'),
+]
+
+
 class Klaus(flask.Flask):
     jinja_options = {
         "extensions": [] if jinja2_autoescape_builtin else ["jinja2.ext.autoescape"],
@@ -56,26 +78,7 @@ class Klaus(flask.Flask):
 
     def setup_routes(self):
         # fmt: off
-        for endpoint, rule in [
-            ('repo_list',   '/'),
-            ('robots_txt',  '/robots.txt/'),
-            ('blob',        '/<repo>/blob/'),
-            ('blob',        '/<repo>/blob/<rev>/<path:path>'),
-            ('blame',       '/<repo>/blame/'),
-            ('blame',       '/<repo>/blame/<rev>/<path:path>'),
-            ('raw',         '/<repo>/raw/<path:path>/'),
-            ('raw',         '/<repo>/raw/<rev>/<path:path>'),
-            ('submodule',   '/<repo>/submodule/<rev>/'),
-            ('submodule',   '/<repo>/submodule/<rev>/<path:path>'),
-            ('commit',      '/<repo>/commit/<path:rev>/'),
-            ('patch',       '/<repo>/commit/<path:rev>.diff'),
-            ('patch',       '/<repo>/commit/<path:rev>.patch'),
-            ('index',       '/<repo>/'),
-            ('index',       '/<repo>/<path:rev>'),
-            ('history',     '/<repo>/tree/<rev>/'),
-            ('history',     '/<repo>/tree/<rev>/<path:path>'),
-            ('download',    '/<repo>/tarball/<path:rev>/'),
-        ]:
+        for endpoint, rule in ROUTES:
             self.add_url_rule(rule, view_func=getattr(views, endpoint))
             if "<repo>" in rule:
                 self.add_url_rule(
